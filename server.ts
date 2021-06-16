@@ -12,22 +12,44 @@ app.use(bodyParser.json())
 
 app.listen(port, () => console.log(`App running on port ${port}`))
 
-app.post("/getData", (req, res, next) => {
+function makeRequest(url: string): any{
+    return axios
+    .get(url)
+    .then(response => {
+        if(response.status == 200){
+            return(response.data);
+        } else {
+            return makeRequest(url)
+        }
+    })
+    .catch(error => {
+        return makeRequest(url)
+    })
+}
+ 
+app.post("/getData", (req, res,) => {
 
     const acceptedProviders = [
         "gas", 
         "internet",
     ]
-    let provider;
+    let provider: string;
+    let callbackUrl: string;
 
-    if(acceptedProviders.includes(req.body.provider)){
+    if(acceptedProviders.includes(req.body.provider) && req.body.callbackUrl){
         provider = req.body.provider;
-        axios
-            .get(datahogURL + provider)
-            .then(response => res.json(response.data))
-            .catch (error => next(error))
-    } else {
-        res.send("Invalid provider supplied");
-    }
+        callbackUrl = req.body.callbackUrl;
 
+        makeRequest(datahogURL + provider).then((response: any) => {
+            app.get(callbackUrl, (req, res,) => {
+                res.send(response);
+            })
+        })
+
+        res.sendStatus(200)
+    
+    } else {
+        res.send("Invalid body");
+    }
 });
+

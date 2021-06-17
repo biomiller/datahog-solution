@@ -1,6 +1,6 @@
 version: '3.7'
 services:
   datahog:
-    build: ./datahog
+    build: ./datahog-server
     ports:
       - "3000:3000"

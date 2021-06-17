@@ -10,7 +10,7 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json())
 
-app.listen(port, () => console.log(`App running on port ${port}`))
+export const server = app.listen(port, () => console.log(`App running on port ${port}`))
 
 function makeRequest(url: string): any{
     return axios
@@ -27,6 +27,9 @@ function makeRequest(url: string): any{
     })
 }
  
+// @route POST getData
+// @desc request information from a provider and send result to a specified callbackUrl
+// @access Public
 app.post("/getData", (req, res,) => {
 
     const acceptedProviders = [
@@ -52,4 +55,3 @@ app.post("/getData", (req, res,) => {
         res.send("Invalid body");
     }
 });
-
